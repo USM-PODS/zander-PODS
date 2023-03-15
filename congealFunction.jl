@@ -3,37 +3,15 @@ using DataFrames
 
 include("DataModulePODS.jl")
 
-#! buoyID = "44007" #the ID number for the buoy
-#! txt = ".txt" #matches the file type of the text files from NDBC
-#! h = "h" #This is an h, its just a part of the names from the NDBC maybe it means hourly?
-#! undscore ="_" #For new naming convention
-#! commasep = ".csv" #used to write out files as comma seperated
-
-#! ERR = ["N/A", 99.0, 99.0, 99.0, 99.0] #initializes an array to hold error values for individual columns and the date error values that can't be automated #!Structure?
-
-startYear = 1982
-endYear = 2021
-
 function NOAAcsvStitching(buoyID, startYear, endYear, writeOut = false)
     
     ERR = [] #initializes an array to hold error values for individual columns
 
     str_buoyID = string(buoyID)
-    
-    #! str_startYear = string(startYear)
-
-    h = "h" #This is an h, its just a part of the names from the NDBC maybe it means hourly?
-    undscore ="_" #For new naming convention
-    txt = ".txt" #matches the file type of the text files from NDBC
-    commasep = ".csv" #used to write out files as comma seperated
 
     fullDF = data.frame(matrix(ncol = 18, nrow = 0))
     
     colnames(fullDF) = DefaultColumns
-
-    #! fullDF = CSV.read(str_BouyID*h*str_startYear.txt, DataFrame, header=1, delim=" ", ignorerepeated=true) #Initialize dataframe
-
-    #! println(ERR) #prints error to make sure nothing untoward is included
 
     for i in 2:length(defaultColumns)
        append!(ERR, defaultColumns[i].errorValue)
@@ -42,7 +20,7 @@ function NOAAcsvStitching(buoyID, startYear, endYear, writeOut = false)
     for runningYear in startYear:endYear  #Loop through number of years excluding the first as that is the year used to intialize the array
 
         yearName = string(runningYear) #turns year into a string
-        pullName = str_buoyID*h*yearName*txt  #Assemble file name for the year in acordance with NDBC
+        pullName = str_buoyID*"h"*yearName*".txt"  #Assemble file name for the year in acordance with NDBC
 
         if runningYear > 2006  #account for the move from one row of headers to two during the year 2006
             workingDF = CSV.read(pullName, DataFrame, header=1:2, delim=" ", ignorerepeated=true)
@@ -73,7 +51,7 @@ function NOAAcsvStitching(buoyID, startYear, endYear, writeOut = false)
         end
 
         if writeOut == true
-            pushName = str_buoyID*undscore*yearName*commasep #sets a new name for the new comma separated files
+            pushName = str_buoyID*"_"*yearName*".csv" #sets a new name for the new comma separated files
 
             CSV.write(pushName, workingDF)
         end
@@ -82,7 +60,7 @@ function NOAAcsvStitching(buoyID, startYear, endYear, writeOut = false)
     end
     
         if writeOut == true
-            CSV.write("44007_1982-2021.csv", fullDF)
+            CSV.write(str_buoyID * "/" * str_buoyID * "_" * yearName * ".csv", fullDF)
         end
     return fullDF
 end
