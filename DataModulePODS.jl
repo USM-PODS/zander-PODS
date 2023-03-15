@@ -22,7 +22,7 @@ struct Columns
     formalName::String
     units::String
     uncertainty::Float64
-    errorValue::Vector{Number}
+    errorValue::Vector{Any}
     info::String
     defaultBins::Int64
     normalLimits::Vector{Number}
