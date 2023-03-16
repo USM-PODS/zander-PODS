@@ -4,8 +4,32 @@ using DataFrames
 include("DataModulePODS.jl")
 
 function NOAAcsvStitching(buoyID, startYear, endYear, writeOut = false)
+
+    """
+        This function uses text files of data formatted as seen on the NDBC website and processes the data into uniform 
+    comma delimited files and compiles data from each year into one large file containing all of the data collected from each buoy.
+    
+        --------------------------------------------------------------------------------------
+        INPUTs
+            buoyID    ->  The numerical ID of the buoy
+            startYear ->  The year that corresponds to the earliest txt file to be processed
+            endYear   ->  The year that corresponds to the latest txt file to be processsed
+            writeOut  ->  If true writes csv files to the directory for each year and a file 
+                          containing all the data processed
+        --------------------------------------------------------------------------------------
+        OUTPUTS
+            fullDF    ->  A data frame containing all of the data processed
+        --------------------------------------------------------------------------------------
+
+    [Supports NDBC format for years 2021 and earlier]
+
+    """
     
     ERR = [] #initializes an array to hold error values for individual columns
+
+    for i in 1:length(DefaultColumns) #Adds error values from PODS structure to the ERR array
+        append!(ERR, DefaultColumns[i].errorValue)
+     end
 
     fullDF = DataFrame(
         I      = [],
@@ -26,11 +50,7 @@ function NOAAcsvStitching(buoyID, startYear, endYear, writeOut = false)
         XVI    = [],
         XVII   = [],
         XVIII  = [],
-    )
-
-    for i in 1:length(DefaultColumns)
-       append!(ERR, DefaultColumns[i].errorValue)
-    end
+    )   
 
     for runningYear in startYear:endYear  #Loop through number of years excluding the first as that is the year used to intialize the array
 
@@ -77,7 +97,10 @@ function NOAAcsvStitching(buoyID, startYear, endYear, writeOut = false)
     if writeOut == true
         CSV.write(string(buoyID) * "_" * string(startYear) * "-"* string(endYear)* ".csv", fullDF)
     end
+
+    return fullDF
+
 end
 
-NOAAcsvStitching(44027, 2003, 2022, true)
+NOAAcsvStitching(44027, 2003, 2022)
 
