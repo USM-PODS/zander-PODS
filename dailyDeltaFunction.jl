@@ -4,6 +4,7 @@ using Plots
 using Dates
 using SignalAnalysis
 using FFTW
+using NFFT
 
 data_44007 = CSV.read("44007_1982-2021.csv", DataFrame)
 #data_IOSN3 = CSV.read("iosn3_1982-2021.csv", DataFrame)
@@ -73,9 +74,4 @@ println(errDates)
 
 Δ_float = convert(Vector{Float64}, Δ)
 
-fftΔ = fft(Δ_float)
-
-N = 1000
-
-psd(Δ_float)
-specgram(Δ_float)
+nfft2(Δ)
